@@ -37,4 +37,4 @@ if __name__ == '__main__':
     [driver.close() for driver in drivers]
 
     counter2 = time.perf_counter()
-    print(f"Finished in {counter2 - counter1} seconds")
+    print(f"Finished scraping in {counter2 - counter1} seconds")
