@@ -52,8 +52,6 @@ def initialize_browser(username, password, proxy_port, headless=True, **kwargs):
         
     proxy = Proxy()
     capabilities = DesiredCapabilities.CHROME
-    #set page load strategy for faster request
-    capabilities['pageLoadStrategy'] = None
     options = Options()
 
     #random userAgent
