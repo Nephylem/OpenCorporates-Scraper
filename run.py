@@ -9,8 +9,6 @@ from appv2 import initialize_browser, search, save_output
 from concurrent.futures import ThreadPoolExecutor
 
 
-MAX_WORKERS = len(config.accounts)
-
 def open_terms_file(filename):
     terms = []
     with open(os.path.join(appv2.BASE_PATH, filename), "r") as file:
@@ -22,12 +20,13 @@ def open_terms_file(filename):
 if __name__ == '__main__':
 
     drivers = [initialize_browser(**config.accounts[account]) for account in tqdm(config.accounts, desc='Initializing Driver(s)', unit='Driver')]
-
-    print(f'Total driver(s) initialized ==> {len(drivers)}')
+       
+    MAX_WORKERS = len(drivers)
+    print(f'Total driver(s) initialized ==> {MAX_WORKERS}')
     terms = open_terms_file('terms.txt')
     split_terms = np.array_split(terms, MAX_WORKERS)
     
-    print("Scraping the terms...")
+    print(f"Scraping terms with {MAX_WORKERS} workers...")
     counter1 = time.perf_counter()
 
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as exec:

@@ -41,15 +41,30 @@ def initialize_browser(username, password, proxy_port, headless=True, **kwargs):
         wait = WebDriverWait(driver, 5)
 
         driver.get(default_url)
-        
-        usernamefield = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="user_email"]')))
-        passwordfield = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="user_password"]')))
-        submitbutton = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'button[class="btn btn-primary"]')))
+        try:
+            usernamefield = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="user_email"]')))
+            passwordfield = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="user_password"]')))
+            submitbutton = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'button[class="btn btn-primary"]')))
 
-        usernamefield.send_keys(username)
-        passwordfield.send_keys(password)
-        submitbutton.click()
-        
+            usernamefield.send_keys(username)
+            passwordfield.send_keys(password)
+            submitbutton.click()
+        except:
+            print('503 Service Unavailable..')
+            print('Retring request')
+            time.sleep(10)
+            driver.refresh() 
+            try:
+                usernamefield = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="user_email"]')))
+                passwordfield = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="user_password"]')))
+                submitbutton = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'button[class="btn btn-primary"]')))
+
+                usernamefield.send_keys(username)
+                passwordfield.send_keys(password)
+              
+            except: 
+                driver.quit()
+                
     proxy = Proxy()
     capabilities = DesiredCapabilities.CHROME
     options = Options()
@@ -123,10 +138,19 @@ def result_for_OC1(term, driver):
     html = driver.page_source
     soup = BeautifulSoup(html, 'html.parser')
 
-    # oc1 number of found companies
-    oc1_results_element = soup.select_one(config.num_companies_selector)
-    oc1_results = int(re.findall(string=oc1_results_element.get_text(), pattern=config.oc_results_pattern)[0].replace(',', ""))
-
+    try:
+        # oc1 number of found companies
+        oc1_results_element = soup.select_one(config.num_companies_selector)
+        oc1_results = int(re.findall(string=oc1_results_element.get_text(), pattern=config.oc_results_pattern)[0].replace(',', ""))
+    except:
+        time.sleep(5)
+        driver.refresh()
+        try:
+            oc1_results_element = soup.select_one(config.num_companies_selector)
+            oc1_results = int(re.findall(string=oc1_results_element.get_text(), pattern=config.oc_results_pattern)[0].replace(',', ""))
+        
+        except: 
+            oc1_results = 0
     # number of items in the page
     item_results_elements = soup.select(config.items_page_selector)
 
@@ -182,10 +206,19 @@ def result_for_OC2(term, driver):
     html = driver.page_source
     soup = BeautifulSoup(html, 'html.parser')
 
-    # oc2 number of found companies
-    oc2_results_element = soup.select_one(config.num_companies_selector)
-    oc2_results = int(re.findall(string=oc2_results_element.get_text(), pattern=config.oc_results_pattern)[0].replace(',', ""))
-
+    try:
+        # oc2 number of found companies
+        oc2_results_element = soup.select_one(config.num_companies_selector)
+        oc2_results = int(re.findall(string=oc2_results_element.get_text(), pattern=config.oc_results_pattern)[0].replace(',', ""))
+    except:
+        time.sleep(5)
+        driver.refresh()
+        try:
+            oc2_results_element = soup.select_one(config.num_companies_selector)
+            oc2_results = int(re.findall(string=oc2_results_element.get_text(), pattern=config.oc_results_pattern)[0].replace(',', ""))
+        except:
+            oc2_results = 0
+            
     # number of items in the page
     item_results_elements = soup.select(config.items_page_selector)
 
@@ -269,11 +302,11 @@ def search(driver, terms=[]):
     return output
     
 
-def save_output(output_dict):
+def save_output(output_dict, destination='output'):
     
     current_time = datetime.now().strftime("(%H%M%S)")
     dataframe = pd.DataFrame(output_dict)
-    dataframe.to_csv(f'output{current_time}.csv', index=False)
+    dataframe.to_csv(f'{destination}/output{current_time}.csv', index=False)
 
 
 
