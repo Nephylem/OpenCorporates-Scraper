@@ -11,7 +11,8 @@ proxies = {"user" : {"proxy_port": "sample", "username":"sample", "password": "s
 #CSS SELECTORS
 
 num_companies_selector = 'div[class="span7"]>h2'
-items_page_selector = 'li[class*="search-result company "] a[class*="company_search_result"]'
+items_page_selector = 'a.company_search_result'
+items_page_selectorv2 = 'li[class*="search-result company "] a[class*="company_search_result"]'
 jurisdiction_filter_selector = 'div[class="facet jurisdiction_code selected sidebar-item"]>ul li'
 
 #REGULAR EXPRESSION PATTERNS

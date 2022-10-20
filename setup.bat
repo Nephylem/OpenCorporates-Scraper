@@ -1,4 +1,6 @@
 @echo off
+
+"C:\Users\TB\AppData\Local\Programs\Python\Python39\python.exe" "get-pip.py"
 pip install virtualenv
 python3 -m virtualenv env
 call env\Scripts\activate.bat
