@@ -1,5 +1,6 @@
 import os, time
 import numpy as np
+from tqdm import tqdm
 
 import appv2
 import config
@@ -18,24 +19,22 @@ def open_terms_file(filename):
         file.close()
     return terms
 
-counter1 = time.perf_counter()
 if __name__ == '__main__':
 
-    print("Initializing Drivers....")
-    drivers = [initialize_browser(**config.accounts[account]) for account in config.accounts]
+    drivers = [initialize_browser(**config.accounts[account]) for account in tqdm(config.accounts, desc='Initializing Driver(s)', unit='Driver')]
 
     print(f'Total driver(s) initialized ==> {len(drivers)}')
     terms = open_terms_file('terms.txt')
     split_terms = np.array_split(terms, MAX_WORKERS)
     
     print("Scraping the terms...")
+    counter1 = time.perf_counter()
+
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as exec:
         for result in exec.map(search, drivers, split_terms):
-            save_output(result)
-
-    
-    [driver.close() for driver in drivers]
+            save_output(result)    
             
-counter2 = time.perf_counter()
+    [driver.close() for driver in drivers]
 
-print(f"Finished in {counter2 - counter1} seconds")
+    counter2 = time.perf_counter()
+    print(f"Finished in {counter2 - counter1} seconds")
